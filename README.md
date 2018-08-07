@@ -18,7 +18,7 @@ In PAW, identities are separated by origin. This means if the user visited malic
 
 # How it works
 
-![flow](https://gitlab.com/jrjr1/paw.js/raw/master/images/PAW%20authentication%20flow.svg)
+![flow](https://gitlab.com/jrjr1/paw.js/raw/master/images/PAW%20authentication%20flow.png)
 
 # Demo
 

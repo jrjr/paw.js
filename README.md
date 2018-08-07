@@ -18,7 +18,7 @@ In PAW, identities are separated by origin. This means if the user visited malic
 
 # How it works
 
-![alt text](/images/PAW authentication flow.svg)
+![alt text](images/PAW authentication flow.svg)
 
 # Demo
 

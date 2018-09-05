@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <script async src="paw.js"></script>
+  <title>Passwordless Authentication Wallet</title>
+  <link rel="stylesheet" href="https://wallet.pawjs.pw/stylesheets/bulma.css">
+  <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css"> -->
+
+  <!-- <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script> -->
+  <script defer src="https://wallet.pawjs.pw/fontawesome-all.js"></script>
+  <script>
+    window.addEventListener('load', function(){
+      // var p = {
+      //   can_signup: false
+      // };
+      window.paw = new PAW(messagecb, {debug: false}); // opens wallet for this origin
+      show_login();
+
+    });
+
+    function messagecb(origin) {
+      console.log("messagecb: " + origin);
+      make_origin_visible(origin);
+      populate_identities();
+    }
+
+    function show_login() {
+      var signup = document.getElementById("signuptab");
+      signup.setAttribute("style", "display:none;");
+      var login = document.getElementById("logintab");
+      login.setAttribute("style","display:flex;");
+
+      document.getElementById("logintab1").className="is-active";
+      document.getElementById("signuptab1").className="";
+    }
+
+    function show_signup() {
+      //alert(2);
+      var signup = document.getElementById("signuptab");
+      signup.setAttribute("style", "display:flex;");
+      var login = document.getElementById("logintab");
+      login.setAttribute("style","display:none;");
+
+      document.getElementById("logintab1").className="";
+      document.getElementById("signuptab1").className="is-active";
+    }
+
+    function login(element) {
+      console.log("in login");
+      var myid = element.text;
+
+      console.log("logging in with: " + myid);
+
+      window.paw.sign_for_operation("login", myid, function (postbackmessage) {
+        console.log("signed for identity and signed message is:");
+        console.log(postbackmessage);
+        console.log("now going to respond with signed message");
+        window.paw.send(postbackmessage, function (err, errmsg) {
+          console.log('in send cb');
+          if (!err) {
+            console.log("status is good");
+            window.close();
+          }
+        });
+      });
+    }
+
+    function populate_identities() {
+      console.log("populating identities");
+
+      var menulist = document.getElementById("mymenu");
+      //var selecttag = document.getElementById("identities");
+
+      window.paw.get_identities(function(event) {
+        console.log(event.target.result);
+        console.log(event);
+        var latestidentities=event.target.result;
+        console.log(latestidentities);
+
+        if (latestidentities && 'keypairs' in latestidentities && 'origin' in latestidentities) {
+          ids = Object.keys(latestidentities.keypairs);
+          for (id in ids )
+          {
+            console.log(ids[id]);
+            var entry = document.createElement('li');
+            var atag = document.createElement('a');
+            atag.setAttribute("style", "font-size: 1.5em");
+            atag.setAttribute("onclick","login(this)");
+            atag.insertAdjacentText('beforeend', ids[id]);
+            entry.appendChild(atag);
+            //list.appendChild(entry);
+            //  menuitem.insertAdjacentHTML();
+            //var option = document.createElement("option");
+            //  option.text = ids[id];
+            //    selecttag.add(option);
+            menulist.appendChild(entry);
+          }
+        }
+      });
+    }
+
+    function make_origin_visible(torigin) {
+      console.log("making origin visible: "+torigin)
+      var requested_origin = document.getElementById("requested_origin");
+      requested_origin.textContent=torigin;
+    }
+
+    // click handler for signup button and email/username input
+    function signup() {
+      console.log("in signup");
+      // validate idientiy name/email not empty
+      var newid = document.getElementById("newidentity");
+      console.log(newid.value);
+      if(newid.value != null && newid.value != '') {
+        window.paw.create(newid.value, function(ids) {
+          console.log("new identity created: " + ids);
+
+          console.log("now going to sign for new identity");
+          window.paw.sign_for_operation("signup", newid.value, function (postbackmessage) {
+            console.log("signed for identity and signed message is:");
+            console.log(postbackmessage);
+            console.log("now going to respond with signed message");
+            window.paw.send(postbackmessage, function (err, errmsg) {
+              console.log('in send cb');
+
+              if (!err) {
+                console.log("status is good");
+                window.close();
+              }
+            });
+
+          });
+        });
+      }
+      else {
+        console.log("signup email is empty!");
+      }
+    }
+
+  </script>
+  <!-- <style>
+  .table.is-hoverable2 tbody tr:not(.is-selected):hover {
+  background-color: #E76F51;
+}
+</style> -->
+
+</head>
+<body>
+  <section class="section">
+    <div class="container">
+      <div class="columns is-desktop">
+        <div class="column is-one-third is-offset-one-third">
+          <div class="card">
+            <header class="card-header">
+              <!-- <div class="level" style="width:100%">
+              <div class="level-item has-text-centered"> -->
+              <div class="tabs is-medium is-boxed is-centered is-fullwidth" style="width: 100%;">
+                <ul>
+                  <li id="logintab1" class="is-active"><a onclick="show_login()">Login</a></li>
+                  <li id="signuptab1"><a onclick="show_signup()">Signup</a></li>
+                </ul>
+              </div>
+
+              <!-- <div class="is-centered">
+              <span class="icon has-text-info title" style="vertical-align:sub;">
+              <i class="fas fa-paw" ></i>
+            </span> -->
+
+            <!-- <h1 class="title card-header-title is-centered" style="margin-left: 0.25em; display: inline-flex;">
+            Login
+          </h1>
+        </div> -->
+        <!-- </div>
+      </div> -->
+      <!-- </p> -->
+    </header>
+
+    <section class="section" style="padding:0.5rem;">
+      <div class="content has-text-centered" style="">
+
+        <p class="level-item is-size-4-desktop card-header-title" style="margin:0;flex-grow:0;" >
+          <span class="icon has-text-info " style="vertical-align:sub;margin-right:0.25em">
+          <i class="fas fa-paw" ></i>
+        </span>
+        <span id="requested_origin" class="has-text-info" style="overflow:auto" ></span>
+      </p>
+
+
+    </div>
+  </section>
+
+  <div class="level" id="logintab">
+    <div class="level-item has-text-centered" style="width:100%" >
+
+      <ul class="menu-list" id="mymenu" style="width:100%">
+        <!-- <li><a style="font-size: 1.5em">Customers</a></li>
+        <li><a style="font-size: 1.5em">Customers</a></li>
+        <li><a style="font-size: 1.5em">Customers</a></li> -->
+        <!-- <li><a style="font-size: 1.5em">Signup</a></li> -->
+
+      </ul>
+
+
+    </div>
+  </div>
+  <div class="level" id="signuptab">
+    <div class="level-item has-text-centered" style="width:100%">
+
+      <ul class="menu-list" id="signupmenu" style="width:100%">
+        <li style="display:flex">
+          <input tabindex="1" style="font-size: 1.5em;margin:0.5em" class="input" type="text" placeholder="Signup with email" id="newidentity">
+        <li>
+          <a onclick="signup()" style="margin:0.5em" tabindex="2" class="button is-large">
+            <span class="icon is-large">
+              <i class="fas fa-user-plus"></i>
+            </span>
+          </a>
+        </li>
+        </li>
+
+      </ul>
+
+
+    </div>
+  </div>
+
+</div>
+
+</div>
+</div>
+
+<div class="columns is-desktop">
+  <div class="column is-one-third is-offset-one-third">
+    <!-- <div class="card">
+    <div class="level">
+    <div class="level-item has-text-centered"> -->
+    <!-- </div>
+  </div>
+
+</div> -->
+  </div>
+</div>
+
+</div>
+
+</section>
+
+<!-- <button type="button" onclick="login()">Login</button><br/> -->
+<!-- <input type="text" placeholder="Enter a username/email" id="newidentity">
+<button type="button" onclick="signup()">Signup</button> -->
+
+
+</body>
+</html>

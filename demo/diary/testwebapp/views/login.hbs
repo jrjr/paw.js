@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://wallet.pawjs.pw/stylesheets/bulma.css">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.min.css"> -->
+
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+
+    <title>Passwordless Authentication Wallet Web App</title>
+
+    <script>
+    var t;
+    var wallet_i_want_to_use= "https://wallet.pawjs.pw";
+
+    function showlogin() {
+      console.log("in show login");
+      t = window.open(wallet_i_want_to_use);
+      console.log("in opener");
+
+      // we don't have a window onload, so we have to poll it
+      var myinterval = setInterval(function () {
+        console.log("trying to send hello");
+        try {
+          t.postMessage("PAW_auth", wallet_i_want_to_use);
+          console.log("sent auth request, now stopping interval");
+          clearInterval(myinterval); // if there was no execption
+        }
+        catch (err) {
+          console.log("problem postmessage");
+          console.log(err);
+        }
+      }, 600);
+
+      console.log("adding message listener");
+      window.addEventListener("message", this.messagehandler );
+
+    }
+    var temp;
+
+    function messagehandler(message) {
+      // if(/^http://www\.examplesender\.com$/.test(message.origin)){
+      //    document.getElementById("message").innerHTML = message.data;
+      // }
+      // TODO
+      //validate origin if they can use this wallet
+      // check local storage for origin domain
+      //   populate all existing identities for login
+      //   ask user if they want to login as a user already registered for this origin or to sign up? if signup is enabled.
+      // might need to only accept one postmessage event???????
+      console.log("got new message:");
+      console.log(message.source);
+
+      console.log(message.origin);
+      console.log(message.data);
+      if (message.origin === wallet_i_want_to_use) {
+        console.log("got it from the valid origin");
+        console.log("i can now send this to the server");
+        fetch(window.origin + "/auth", {
+          body: JSON.stringify(message.data), // must match 'Content-Type' header
+          cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+          credentials: 'same-origin',
+          headers: {
+            'content-type': 'application/json'
+          },
+          method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        }).then(function(response) {
+          //=response;
+          return response.json();
+        }).then(function(response) {
+          temp=response;
+          console.log("response:");
+        //  console.log(response.json());
+          if ("error" in response) {
+            console.log("error");
+            var z = document.getElementById("mmtext");
+            switch(response.error) {
+                case "1":
+                  z.textContent="Invalid signature.";
+                  break;
+                case "2":
+                  z.textContent="Timestamp outside of window threshold.";
+                  break;
+                case "3":
+                  z.textContent="User account already in use, try another.";
+                  break;
+                case "4":
+                  z.textContent="Unknown operation.";
+                  break;
+                case "5":
+                  z.textContent="User does not yet exist.";
+                  break;
+                case "6":
+                  z.textContent="Valid fingerprint not found, login denied.";
+                  break;
+                default:
+                  z.textContent="Unknown error";
+
+            }
+            z.parentElement.hidden=false;
+          }
+          else {
+            console.log("no error");
+            window.location.reload();
+          }
+        }).catch(function(error) {
+          console.log('There has been a problem with your fetch operation: ', error.message);
+        });
+      }
+      // we only want to listen for one message from the sender as there could be other windows open to this origin
+      window.removeEventListener("message", this.messagehandler);
+    }
+
+    </script>
+
+  </head>
+  <body>
+    <section class="hero is-large">
+      <div class="hero-body">
+        <div class="container has-text-centered">
+          <div class="notification is-danger" hidden >
+            <button onclick="this.parentNode.hidden=true;" class="delete"></button>
+            <div id="mmtext">
+            </div>
+          </div>
+          <h1 class="title">
+            {{title}}
+          </h1>
+          <!-- <h2 class="subtitle">
+            Large subtitle
+          </h2> -->
+
+          <a class="button is-medium" onclick="showlogin()">
+            <span class="icon has-text-info">
+              <i class="fas fa-paw"></i>
+            </span>
+            <span>Login with PAW</span>
+          </a>
+
+        </div>
+      </div>
+      <!-- <button type="button" onclick="showlogin()">Login or Signup with PAW wallet</button><br/> -->
+
+    </section>
+
+  </body>
+</html>

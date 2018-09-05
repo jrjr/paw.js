@@ -1,0 +1,7 @@
+users {
+  id: int,
+  username: string,
+  active_pubkey_fingerprints: json[],
+  pending_pubkey_fingerprints: json[],
+  diary_entries: json []
+}

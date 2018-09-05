@@ -18,15 +18,15 @@ In PAW, identities are separated by origin. This means if the user visited malic
 
 # Why
 
-Because I or someone know has been affected by each of these problems in one way or another, and I think they should've been solved by now.
-
-# How it works
-
-![flow](https://gitlab.com/jrjr1/paw.js/raw/master/images/PAW%20authentcation%20flow.png?inline=true)
+Because I or someone I know has been affected by each of these problems in one way or another, and I think they should've been solved by now.
 
 # Demo
 
 [https://demo.pawjs.pw/](https://demo.pawjs.pw/)
+
+# How it works
+
+![flow](https://gitlab.com/jrjr1/paw.js/raw/master/images/PAW%20authentcation%20flow.png?inline=true)
 
 # How to use
 Store PAW on separate origin (preferably static assets only) or use existing PAW. The most secure option would have PAW running on a localhost origin. See below for some examples.

@@ -63,7 +63,7 @@ function messagehandler(message) {
     // send it to the web app backend to validate
     fetch(window.origin + "/auth", {
       body: JSON.stringify(message.data), // must match 'Content-Type' header
-      cache: 'no-cache', no-cache, reload, force-cache, only-if-cached
+      cache: 'no-cache', //no-cache, reload, force-cache, only-if-cached
       credentials: 'same-origin',
       headers: {
         'content-type': 'application/json'

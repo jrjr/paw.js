@@ -7,7 +7,7 @@ const njwk = require('node-jwk');
 const { TextEncoder, TextDecoder } = require('text-encoding');
 var atob = require('atob');
 
-const timestamp_threshold = 10000; // 10, 20, or 30 seconds??
+const timestamp_threshold = 30000; // 10, 20, or 30 seconds??
 const session_threshold = 86400000; // session expires in this amount of time: 24 hours
 //var jwk2pem = require('pem-jwk').jwk2pem;
 var authrequired   = [authChecker];
@@ -214,7 +214,7 @@ router.post('/auth', function(req, res, next) {
       console.log("time diff: "+ dif);
 
       // check timestamp within valid window
-      if (dif > 0 && dif < timestamp_threshold) {
+      if (dif > -timestamp_threshold && dif < timestamp_threshold) {
         console.log("timestamp is within window threshold, continuing");
 
         //  var user_already_exists = check_if_user_exists(data[0].identity);

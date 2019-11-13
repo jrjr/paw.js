@@ -20,10 +20,6 @@ In PAW, identities are separated by origin. This means if the user visited malic
 
 Because I or someone I know has been affected by each of these problems in one way or another, and I think they should've been solved by now.
 
-# Demo
-
-[https://demo.pawjs.pw/](https://demo.pawjs.pw/)
-
 # How it works
 
 ![flow](https://gitlab.com/jrjr1/paw.js/raw/master/images/PAW%20authentcation%20flow.png?inline=true)
